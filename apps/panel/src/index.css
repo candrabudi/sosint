@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --color-canvas: var(--canvas);
+  --color-shell: var(--shell);
+  --color-card: var(--card);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-blue: var(--blue);
+  --color-blue-soft: var(--blue-soft);
+  --color-pos: var(--pos);
+  --color-good: var(--good);
+  --color-good-soft: var(--good-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+}
+
+:root {
+  --canvas: #e6e7ea;
+  --shell: #eeeff1;
+  --card: #f8f8f9;
+  --line: #dfe0e3;
+  --ink: #1d1f23;
+  --ink-2: #5d6168;
+  --ink-3: #9a9da3;
+  --accent: #d4502e;
+  --accent-soft: #f6dfd7;
+  --blue: #7b9bd1;
+  --blue-soft: #e3eaf6;
+  --pos: #2f9b55;
+  --good: #3f8f4e;
+  --good-soft: #dff0dc;
+  --warn: #b88a1c;
+  --warn-soft: #f6ecd0;
+}
+
+.dark {
+  --canvas: #121316;
+  --shell: #1a1c20;
+  --card: #22252a;
+  --line: #2f3238;
+  --ink: #eceef1;
+  --ink-2: #a6aab2;
+  --ink-3: #6d7179;
+  --accent: #e6623f;
+  --accent-soft: #3a2621;
+  --blue: #8eabdc;
+  --blue-soft: #263247;
+  --pos: #4fbf75;
+  --good: #6cc27b;
+  --good-soft: #1f3324;
+  --warn: #d9ac45;
+  --warn-soft: #3a3220;
+}
+
+/* Tailwind v4 menghapus cursor pointer default — kembalikan untuk semua elemen interaktif */
+@layer base {
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  [role='tab'],
+  [role='menuitem'],
+  [role='menuitemradio'],
+  a[href],
+  select,
+  summary,
+  label[for],
+  input[type='checkbox'],
+  input[type='radio'] {
+    cursor: pointer;
+  }
+  button:disabled,
+  [aria-disabled='true'] {
+    cursor: not-allowed;
+  }
+}
+
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.96) translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes dialog-in {
+  from { opacity: 0; transform: translate(-50%, -48%) scale(0.97); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes dialog-out {
+  from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  to { opacity: 0; transform: translate(-50%, -48%) scale(0.97); }
+}
+@keyframes shimmer { 100% { transform: translateX(100%); } }
+@keyframes tip-in {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: none; }
+}
+
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Recharts v3: SVG chart bisa difokus (accessibility layer) → klik memunculkan kotak outline.
+   Hilangkan saat klik mouse, tetap tampil ring halus untuk navigasi keyboard. */
+.recharts-wrapper,
+.recharts-wrapper svg,
+.recharts-surface,
+.recharts-wrapper *:focus {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.recharts-wrapper:has(svg:focus-visible) {
+  border-radius: 12px;
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--ink-3) 45%, transparent);
+}
+.recharts-wrapper .recharts-rectangle,
+.recharts-wrapper .recharts-curve,
+.recharts-wrapper .recharts-sector {
+  transition: opacity 0.2s ease, fill-opacity 0.2s ease;
+}
