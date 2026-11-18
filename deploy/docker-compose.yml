@@ -1,0 +1,51 @@
+# SOSINT (sig-analytics) di server bersama. Di-proxy oleh nginx Mailcow (lihat mailcow-sosint.conf).
+# Rahasia di /opt/sosint/.env (chmod 600). Hanya panel yang dibuka, ke bridge Mailcow 172.22.1.1.
+name: sosint
+
+services:
+  panel:
+    build: { context: .., dockerfile: deploy/Dockerfile, target: panel }
+    image: sosint-panel:latest
+    restart: unless-stopped
+    ports: ["172.22.1.1:6020:80"]
+    mem_limit: 64m
+    depends_on: [api]
+
+  api:
+    build: { context: .., dockerfile: deploy/Dockerfile, target: app }
+    image: sosint-app:latest
+    restart: unless-stopped
+    mem_limit: 320m
+    env_file: ../.env
+    environment:
+      NODE_ENV: production
+      API_PORT: "3000"
+      TRUST_PROXY: loopback, linklocal, uniquelocal
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  # one-shot: docker compose run --rm migrate  /  docker compose run --rm migrate pnpm db:seed
+  migrate:
+    image: sosint-app:latest
+    profiles: [tools]
+    env_file: ../.env
+    command: ["pnpm", "db:migrate"]
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    mem_limit: 256m
+    environment:
+      POSTGRES_DB: sosint
+      POSTGRES_USER: sosint
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?isi POSTGRES_PASSWORD di .env}
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sosint -d sosint"]
+      interval: 5s
+      retries: 10
+
+volumes:
+  pgdata:
